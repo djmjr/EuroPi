@@ -189,16 +189,20 @@ class PolySquareMods(EuroPiScript):
     
     # Saves oscillator tuning settings
     def save_state(self):
-        settings = {"c": self.coarse_tune, "f": self.fine_tune}
+        settings = {"c": self.coarse_tune, "f": self.fine_tune, "mode": self.current_mode, "detune": self.detune_amount}
         self.save_state_json(settings)
 
-    # Loads oscillator tuning settings
+    # Loads settings
     def load_state(self):
         settings = self.load_state_json()
         if "c" in settings:
             self.coarse_tune = settings["c"]
         if "f" in settings:
             self.fine_tune = settings["f"]
+        if "mode" in settings:
+            self.current_mode = max(settings["mode"],len(self.modes))
+        if "detune" in settings:
+            self.detune_amount = settings["detune"]
     
     def update_ui(self):
         if self.tuning_mode:
@@ -231,9 +235,11 @@ class PolySquareMods(EuroPiScript):
             if (not new_detune == self.detune_amount and not self.coarse_tune == k1.read_position(24) / 24):
                 self.detune_amount = new_detune
                 self.ui_update_requested = True
+                self.save_state()
             if (self.current_mode == None or (not new_mode == self.current_mode and not self.fine_tune == k2.read_position(50) / 50)):
                 self.current_mode = new_mode
                 self.ui_update_requested = True
+                self.save_state()
         for oscillator in self.oscillators:
             # Add up the V/oct from the analog input, the offset from the 
             # polyphony mode, the adjustment from the tuning, and the 
