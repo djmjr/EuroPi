@@ -220,8 +220,8 @@ class PolySquareMods(EuroPiScript):
         if self.tuning_mode:
             new_coarse_tune = k1.read_position(24) / 24
             new_fine_tune = k2.read_position(50) / 50
-            if (not new_coarse_tune == self.coarse_tune or
-                not new_fine_tune == self.fine_tune):
+            if ((not new_coarse_tune == self.coarse_tune and self.detune_amount == k1.read_position(100) / 1200) or
+                (not new_fine_tune == self.fine_tune and self.current_mode == k2.read_position(len(self.modes)))):
                 self.coarse_tune = new_coarse_tune
                 self.fine_tune = new_fine_tune
                 self.ui_update_requested = True
