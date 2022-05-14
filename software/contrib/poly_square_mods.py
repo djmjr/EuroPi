@@ -187,7 +187,7 @@ class PolySquareMods(EuroPiScript):
         return self.modes[self.current_mode].voltage_offsets[
             self.oscillators.index(oscillator)]
     
-    # Saves oscillator tuning settings
+    # Saves settings
     def save_state(self):
         settings = {"c": self.coarse_tune, "f": self.fine_tune, "mode": self.current_mode, "detune": self.detune_amount}
         self.save_state_json(settings)
@@ -200,7 +200,7 @@ class PolySquareMods(EuroPiScript):
         if "f" in settings:
             self.fine_tune = settings["f"]
         if "mode" in settings:
-            self.current_mode = max(settings["mode"],len(self.modes))
+            self.current_mode = min(settings["mode"],len(self.modes))
         if "detune" in settings:
             self.detune_amount = settings["detune"]
     
@@ -224,8 +224,8 @@ class PolySquareMods(EuroPiScript):
         if self.tuning_mode:
             new_coarse_tune = k1.read_position(24) / 24
             new_fine_tune = k2.read_position(50) / 50
-            if ((not new_coarse_tune == self.coarse_tune and self.detune_amount == k1.read_position(100) / 1200) or
-                (not new_fine_tune == self.fine_tune and self.current_mode == k2.read_position(len(self.modes)))):
+            if ((not new_coarse_tune == self.coarse_tune and not self.detune_amount == k1.read_position(100) / 1200) or
+                (not new_fine_tune == self.fine_tune and not self.current_mode == k2.read_position(len(self.modes)))):
                 self.coarse_tune = new_coarse_tune
                 self.fine_tune = new_fine_tune
                 self.ui_update_requested = True
